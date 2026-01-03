@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agri AI – Irrigation Recommendation</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Script -->
+    <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <style>
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #0f2027, #000);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .dashboard {
+            width: 950px;
+            background: #111;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(79,195,255,0.25);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4fc3ff;
+            margin-bottom: 25px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: #1b1b1b;
+            padding: 22px;
+            border-radius: 16px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 8px 0;
+            border-radius: 10px;
+            border: none;
+            background: #222;
+            color: white;
+        }
+
+        input::placeholder { color: #9aa0a6; }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 8px rgba(79,195,255,0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 12px;
+            background: linear-gradient(135deg, #2196f3, #4fc3ff);
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .water {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4fc3ff;
+        }
+
+        ul { padding-left: 18px; }
+
+        li {
+            margin-bottom: 6px;
+            color: #d8efff;
+        }
+
+        canvas { margin-top: 15px; }
+
+        @media(max-width: 950px) {
+            .dashboard { width: 95%; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="dashboard">
+    <h1>💧 Irrigation Recommendation</h1>
+
+    <div class="grid">
+        <!-- INPUT CARD -->
+        <div class="card">
+            <form method="post" id="irrigationForm">
+                <input name="soil_ph" placeholder="Soil pH" required>
+                <input name="soil_moisture" placeholder="Soil Moisture" required>
+                <input name="nitrogen" placeholder="Nitrogen (N)" required>
+                <input name="phosphorus" placeholder="Phosphorus (P)" required>
+                <input name="potassium" placeholder="Potassium (K)" required>
+                <input name="temperature" placeholder="Temperature (°C)" required>
+                <input name="humidity" placeholder="Humidity (%)" required>
+                <button type="submit" id="predictBtn">Calculate Irrigation</button>
+            </form>
+        </div>
+
+        <!-- RESULT CARD -->
+        {% if irrigation %}
+        <div class="card">
+            <h3>💦 Recommended Irrigation</h3>
+            <div class="water">{{ irrigation }} mm</div>
+
+            <!-- GRAPH -->
+            <canvas id="irrigationChart"></canvas>
+
+            <script>
+                new Chart(document.getElementById("irrigationChart"), {
+                    type: "bar",
+                    data: {
+                        labels: ["Water Requirement"],
+                        datasets: [{
+                            data: [{{ irrigation }}],
+                            backgroundColor: "#4fc3ff"
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: {{ max_water }}
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            </script>
+
+            <hr style="margin:15px 0; border-color:#333">
+
+            <h4>🧠 Why this amount?</h4>
+            <ul>
+                {% for reason in explanation %}
+                    <li>{{ reason }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

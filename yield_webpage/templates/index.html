@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yield Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+    <style>
+        body {
+            background: radial-gradient(circle at top, #1b1b1b, #000);
+            color: white;
+            font-family: Poppins;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .box {
+            background: #111;
+            padding: 30px;
+            border-radius: 18px;
+            width: 900px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: #222;
+            border: none;
+            color: white;
+            border-radius: 10px;
+        }
+        button {
+            background: linear-gradient(135deg, #ff9800, #ffc107);
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .value {
+            font-size: 28px;
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+<h2>🌾 Yield Prediction</h2>
+
+<div class="grid">
+<form method="post" id="form">
+<select name="crop" required>
+<option value="">Select Crop</option>
+{% for c in crops %}
+<option value="{{ c }}">{{ c }}</option>
+{% endfor %}
+</select>
+
+<input name="area" placeholder="Area (hectares)" required>
+<input name="rainfall" placeholder="Annual Rainfall (mm)" required>
+<input name="fertilizer" placeholder="Fertilizer usage" required>
+<input name="pesticide" placeholder="Pesticide usage" required>
+<button id="btn">Predict Yield</button>
+</form>
+
+{% if prediction %}
+<div>
+<div class="value">{{ prediction }} tons/hectare</div>
+<canvas id="chart"></canvas>
+
+<script>
+new Chart(document.getElementById("chart"), {
+    type: "bar",
+    data: {
+        labels: ["Predicted Yield"],
+        datasets: [{
+            data: [{{ prediction }}],
+            backgroundColor: "#ffc107"
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+</script>
+
+<ul>
+{% for r in explanation %}
+<li>{{ r }}</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
+
+</div>
+</div>
+</body>
+</html>

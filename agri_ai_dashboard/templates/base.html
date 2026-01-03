@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Agri AI Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <h2>🌱 AgriAI</h2>
+    <a href="/crop">Crop</a>
+    <a href="/irrigation">Irrigation</a>
+    <a href="/yield">Yield</a>
+  </aside>
+
+  <main class="content fade">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+</body>
+</html>

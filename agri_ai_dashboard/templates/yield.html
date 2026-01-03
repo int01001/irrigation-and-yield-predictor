@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+<h2>🌾 Yield Prediction</h2>
+
+<form method="post">
+<select name="crop">
+{% for c in crops %}
+<option value="{{ c }}">{{ c }}</option>
+{% endfor %}
+</select>
+
+<input name="area" placeholder="Area (ha)" required>
+<input name="rainfall" placeholder="Rainfall (mm)" required>
+<input name="fertilizer" placeholder="Fertilizer usage" required>
+<input name="pesticide" placeholder="Pesticide usage" required>
+<button>Predict</button>
+</form>
+
+{% if prediction %}
+<h3>Expected Yield: {{ prediction }}</h3>
+
+<script>
+window.yieldValue = {{ prediction }};
+</script>
+
+<canvas id="yieldChart"></canvas>
+
+<div class="explain">
+<h4>🤖 AI Explanation</h4>
+<p>{{ explanation }}</p>
+</div>
+{% endif %}
+</div>
+
+{% endblock %}

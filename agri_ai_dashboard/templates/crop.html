@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+<h2>🌱 Crop Prediction</h2>
+
+<form method="post">
+<input name="soil_ph" placeholder="Soil pH" required>
+<input name="soil_moisture" placeholder="Soil Moisture" required>
+<input name="nitrogen" placeholder="Nitrogen" required>
+<input name="phosphorus" placeholder="Phosphorus" required>
+<input name="potassium" placeholder="Potassium" required>
+<input name="temperature" placeholder="Temperature (°C)" required>
+<input name="humidity" placeholder="Humidity (%)" required>
+<button>Predict</button>
+</form>
+
+{% if prediction %}
+<h3>Recommended Crop: <span class="highlight">{{ prediction }}</span></h3>
+
+<script>
+window.cropSoilData = {{ soil_data | safe }};
+</script>
+
+<canvas id="cropChart"></canvas>
+
+<div class="explain">
+<h4>🤖 AI Explanation</h4>
+<p>{{ explanation }}</p>
+</div>
+{% endif %}
+</div>
+
+{% endblock %}

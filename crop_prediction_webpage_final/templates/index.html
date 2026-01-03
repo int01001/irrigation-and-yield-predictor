@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agri AI – Crop Intelligence</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Script -->
+    <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #0f2027, #000);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .dashboard {
+            width: 950px;
+            background: #111;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(0,255,120,0.25);
+            animation: fadeIn 0.8s ease;
+        }
+
+        h1 {
+            text-align: center;
+            color: #3cff77;
+            margin-bottom: 25px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: #1b1b1b;
+            padding: 22px;
+            border-radius: 16px;
+            animation: slideUp 0.6s ease;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 8px 0;
+            border-radius: 10px;
+            border: none;
+            background: #222;
+            color: white;
+        }
+
+        input::placeholder {
+            color: #9aa0a6;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 8px rgba(60,255,120,0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 12px;
+            background: linear-gradient(135deg, #1db954, #3cff77);
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .crop {
+            font-size: 26px;
+            font-weight: bold;
+            color: #3cff77;
+        }
+
+        .bar {
+            height: 10px;
+            background: #333;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .fill {
+            height: 100%;
+            background: #3cff77;
+        }
+
+        ul {
+            padding-left: 18px;
+        }
+
+        li {
+            margin-bottom: 6px;
+            color: #d0ffd9;
+        }
+
+        canvas {
+            margin-top: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media(max-width: 950px) {
+            .dashboard { width: 95%; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="dashboard">
+    <h1>🌾 Agri AI – Crop Intelligence</h1>
+
+    <div class="grid">
+        <!-- INPUT CARD -->
+        <div class="card">
+            <form method="post" id="predictForm">
+                <input name="soil_ph" placeholder="Soil pH" required>
+                <input name="soil_moisture" placeholder="Soil Moisture" required>
+                <input name="nitrogen" placeholder="Nitrogen (N)" required>
+                <input name="phosphorus" placeholder="Phosphorus (P)" required>
+                <input name="potassium" placeholder="Potassium (K)" required>
+                <input name="temperature" placeholder="Temperature (°C)" required>
+                <input name="humidity" placeholder="Humidity (%)" required>
+                <button type="submit" id="predictBtn">Analyze Soil</button>
+            </form>
+        </div>
+
+        <!-- RESULT CARD -->
+        {% if top_crops %}
+        <div class="card">
+            <h3>🌱 Best Crop</h3>
+            <div class="crop">{{ top_crops[0].name }}</div>
+
+            <h4 style="margin-top:15px;">Top 3 Recommendations</h4>
+
+            {% for crop in top_crops %}
+                <p>{{ crop.name }} – {{ crop.confidence }}%</p>
+                <div class="bar">
+                    <div class="fill" style="width: {{ crop.confidence }}%"></div>
+                </div>
+            {% endfor %}
+
+            <!-- Chart -->
+            <canvas id="confidenceChart"></canvas>
+
+            <script>
+                const labels = {{ chart_labels | tojson }};
+                const values = {{ chart_values | tojson }};
+
+                new Chart(document.getElementById("confidenceChart"), {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Confidence (%)",
+                            data: values,
+                            backgroundColor: "#3cff77"
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: { beginAtZero: true, max: 100 }
+                        }
+                    }
+                });
+            </script>
+
+            <!-- Explanation AI -->
+            {% if explanation %}
+            <hr style="margin:15px 0; border-color:#333">
+            <h4>🧠 Why this crop?</h4>
+            <ul>
+                {% for reason in explanation %}
+                    <li>{{ reason }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>
